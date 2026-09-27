@@ -6,6 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local Server
+
 paths:
   /api/v1/health:
     get:
@@ -18,6 +19,171 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+
+  /api/v1/user-types:
+    get:
+      tags:
+        - UserType
+      summary: Get all user types
+      operationId: listUserTypes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserType'
+    post:
+      tags:
+        - UserType
+      summary: Create a new user type
+      operationId: createUserType
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTypeRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserType'
+
+  /api/v1/user-types/{id}:
+    get:
+      tags:
+        - UserType
+      summary: Get user type by ID
+      operationId: getUserTypeById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserType'
+        '404':
+          description: Not Found
+    put:
+      tags:
+        - UserType
+      summary: Update a user type
+      operationId: updateUserType
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTypeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserType'
+        '404':
+          description: Not Found
+    delete:
+      tags:
+        - UserType
+      summary: Delete a user type
+      operationId: deleteUserType
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+
+  /api/v1/users:
+    get:
+      tags:
+        - User
+      summary: Get all users
+      operationId: listUsers
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+    post:
+      tags:
+        - User
+      summary: Create a newly user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /api/v1/users/{id}/type:
+    put:
+      tags:
+        - User
+      summary: Assign user type to user
+      operationId: assignUserType
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignUserTypeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Not Found
+
 components:
   schemas:
     HealthResponse:
@@ -29,3 +195,54 @@ components:
         timestamp:
           type: string
           format: date-time
+
+    UserType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: Example "Dono de Restaurante" or "Cliente"
+
+    UserTypeRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    UserRequest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        userType:
+          $ref: '#/components/schemas/UserType'
+
+    AssignUserTypeRequest:
+      type: object
+      required:
+        - userTypeId
+      properties:
+        userTypeId:
+          type: integer
+          format: int64
