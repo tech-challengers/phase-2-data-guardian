@@ -47,6 +47,46 @@ paths:
                 $ref: '#/components/schemas/ErroResponse'
 
 
+  /api/v1/restaurantes/{id}:
+    put:
+      tags:
+        - Restaurante
+      summary: Atualizar restaurante
+      operationId: atualizarRestaurante
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestauranteRequest'
+      responses:
+        '200':
+          description: Restaurante atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestauranteResponse'
+        '400':
+          description: Dados do restaurante inválidos
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+        '404':
+          description: Restaurante não encontrado
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+
   /api/v1/user-types:
     get:
       tags:

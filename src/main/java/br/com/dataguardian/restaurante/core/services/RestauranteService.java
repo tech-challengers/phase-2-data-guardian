@@ -8,6 +8,8 @@ import br.com.dataguardian.restaurante.application.ports.out.RestauranteReposito
 import br.com.dataguardian.restaurante.core.domain.Restaurante;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,26 @@ public class RestauranteService implements RestauranteUseCase {
         Restaurante restauranteSalvo = restauranteRepository.salvar(restaurante);
 
         return restauranteConverter.paraResponse(restauranteSalvo);
+    }
+
+    @Override
+    @Transactional
+    public RestauranteResponse atualizarRestaurante(Long id, RestauranteRequest request) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Identificador do restaurante deve ser maior que zero");
+        }
+        validarRestaurante(request);
+
+        Restaurante restaurante = restauranteRepository.buscarPorId(id)
+                .orElseThrow(() -> new NoSuchElementException("Restaurante não encontrado"));
+
+        restaurante.setNome(request.getNome());
+        restaurante.setEndereco(request.getEndereco());
+        restaurante.setGastronomia(request.getGastronomia());
+        restaurante.setHorarioFuncionamento(request.getHorarioFuncionamento());
+        restaurante.setDonoId(request.getDonoId());
+
+        return restauranteConverter.paraResponse(restauranteRepository.salvar(restaurante));
     }
 
     private void validarRestaurante(RestauranteRequest request){

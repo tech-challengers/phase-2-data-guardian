@@ -6,4 +6,6 @@ import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteRespons
 public interface RestauranteUseCase {
 
     RestauranteResponse salvarRestaurante(RestauranteRequest request);
+
+    RestauranteResponse atualizarRestaurante(Long id, RestauranteRequest request);
 }
