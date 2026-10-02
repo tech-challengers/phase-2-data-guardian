@@ -1,8 +1,8 @@
 package br.com.dataguardian.restaurante.core.services;
 
-import br.com.dataguardian.restaurante.application.dto.RestauranteDtoRequest;
-import br.com.dataguardian.restaurante.application.dto.RestauranteDtoResponse;
-import br.com.dataguardian.restaurante.application.dto.mapper.RestauranteConverter;
+import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteRequest;
+import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteResponse;
+import br.com.dataguardian.restaurante.infrastructure.web.dto.mapper.RestauranteConverter;
 import br.com.dataguardian.restaurante.application.usecases.RestauranteUseCase;
 import br.com.dataguardian.restaurante.application.ports.out.RestauranteRepository;
 import br.com.dataguardian.restaurante.core.domain.Restaurante;
@@ -18,28 +18,29 @@ public class RestauranteService implements RestauranteUseCase {
 
 
     @Override
-    public RestauranteDtoResponse salvarRestaurante(RestauranteDtoRequest restauranteDtoRequest) {
-        validarRestaurante(restauranteDtoRequest);
-        Restaurante restaurante = restauranteConverter.paraRestaurante(restauranteDtoRequest);
+    public RestauranteResponse salvarRestaurante(RestauranteRequest request) {
+        validarRestaurante(request);
+
+        Restaurante restaurante = restauranteConverter.paraRestaurante(request);
         Restaurante restauranteSalvo = restauranteRepository.salvar(restaurante);
 
-        return restauranteConverter.paraRestauranteDtoResponse(restauranteSalvo);
+        return restauranteConverter.paraResponse(restauranteSalvo);
     }
 
-    private void validarRestaurante(RestauranteDtoRequest restauranteDtoRequest){
+    private void validarRestaurante(RestauranteRequest request){
 
-        if (restauranteDtoRequest == null){
+        if (request == null){
             throw new IllegalArgumentException("Os dados são obrigatórios!");
         }
 
-        validarCampoObrigatorio(restauranteDtoRequest.nome(), "Nome");
-        validarCampoObrigatorio(restauranteDtoRequest.endereco(), "Endereço");
-        validarCampoObrigatorio(restauranteDtoRequest.gastronomia(), "Gastronomia");
-        validarCampoObrigatorio(restauranteDtoRequest.horarioFuncionamento(), "Horário de Funcionamento");
+        validarCampoObrigatorio(request.getNome(), "Nome");
+        validarCampoObrigatorio(request.getEndereco(), "Endereço");
+        validarCampoObrigatorio(request.getGastronomia(), "Gastronomia");
+        validarCampoObrigatorio(request.getHorarioFuncionamento(), "Horário de Funcionamento");
 
-        /*if (restauranteDtoRequest.donoId() == null || restauranteDtoRequest.donoId() <=0){
+        if (request.getDonoId() == null || request.getDonoId() <= 0){
             throw new IllegalArgumentException("Identificador do dono é obrigatório e deve ser maior que zero");
-        }*/
+        }
     }
 
     private void validarCampoObrigatorio(String valor, String campo){

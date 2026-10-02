@@ -1,10 +1,9 @@
 package br.com.dataguardian.restaurante.application.usecases;
 
-import br.com.dataguardian.restaurante.application.dto.RestauranteDtoRequest;
-import br.com.dataguardian.restaurante.application.dto.RestauranteDtoResponse;
+import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteRequest;
+import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteResponse;
 
 public interface RestauranteUseCase {
 
-    RestauranteDtoResponse salvarRestaurante(
-            RestauranteDtoRequest restauranteDtoRequest);
+    RestauranteResponse salvarRestaurante(RestauranteRequest request);
 }
