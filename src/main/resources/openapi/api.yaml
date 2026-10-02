@@ -184,6 +184,123 @@ paths:
         '404':
           description: Not Found
 
+  /api/v1/restaurants/{restaurantId}/menu-items:
+    get:
+      tags:
+        - MenuItem
+      summary: List menu items of a restaurant
+      operationId: listMenuItemsByRestaurant
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuItemResponse'
+    post:
+      tags:
+        - MenuItem
+      summary: Create a menu item for a restaurant
+      operationId: createMenuItem
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuItemRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '400':
+          description: Invalid data
+
+  /api/v1/menu-items/{id}:
+    get:
+      tags:
+        - MenuItem
+      summary: Get menu item by ID
+      operationId: getMenuItemById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '400':
+          description: Not found or invalid
+    put:
+      tags:
+        - MenuItem
+      summary: Update a menu item
+      operationId: updateMenuItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuItemRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '400':
+          description: Not found or invalid data
+    delete:
+      tags:
+        - MenuItem
+      summary: Delete a menu item
+      operationId: deleteMenuItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Not found
+
 components:
   schemas:
     HealthResponse:
@@ -246,3 +363,50 @@ components:
         userTypeId:
           type: integer
           format: int64
+
+    MenuItemRequest:
+      type: object
+      required:
+        - name
+        - price
+        - dineInOnly
+      properties:
+        name:
+          type: string
+          minLength: 1
+          example: Feijoada completa
+        description:
+          type: string
+          example: Feijoada com arroz, couve e farofa
+        price:
+          type: number
+          minimum: 0
+          example: 49.90
+        dineInOnly:
+          type: boolean
+          description: Available to order only at the restaurant
+          example: false
+        photoPath:
+          type: string
+          description: Path where the dish photo is stored
+          example: /images/menu/feijoada.jpg
+
+    MenuItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        restaurantId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        dineInOnly:
+          type: boolean
+        photoPath:
+          type: string
