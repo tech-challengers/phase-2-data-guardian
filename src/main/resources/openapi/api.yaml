@@ -52,7 +52,7 @@ paths:
       tags:
         - Restaurante
       summary: Atualizar restaurante
-      operationId: atualizarRestaurante
+      operationId: updateRestaurante
       parameters:
         - name: id
           in: path
