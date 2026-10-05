@@ -1,8 +1,9 @@
 package br.com.dataguardian.restaurante.infrastructure.web.controllers;
 
 import br.com.dataguardian.restaurante.core.services.RestauranteService;
-import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteRequest;
-import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteResponse;
+import br.com.restaurante.infrastructure.web.controllers.RestauranteApi;
+import br.com.restaurante.infrastructure.web.dto.RestauranteRequest;
+import br.com.restaurante.infrastructure.web.dto.RestauranteResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

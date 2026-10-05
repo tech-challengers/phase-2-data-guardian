@@ -1,7 +1,8 @@
 package br.com.dataguardian.restaurante.infrastructure.web.controllers;
 
 import br.com.dataguardian.restaurante.application.ports.in.UserUseCase;
-import br.com.dataguardian.restaurante.infrastructure.web.dto.*;
+import br.com.restaurante.infrastructure.web.controllers.UserApi;
+import br.com.restaurante.infrastructure.web.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +45,7 @@ public class UserController implements UserApi {
         req.setName(domain.getName());
         req.setEmail(domain.getEmail());
         if (domain.getUserType() != null) {
-            br.com.dataguardian.restaurante.infrastructure.web.dto.UserType dt = new br.com.dataguardian.restaurante.infrastructure.web.dto.UserType();
+            br.com.restaurante.infrastructure.web.dto.UserType dt = new br.com.restaurante.infrastructure.web.dto.UserType();
             dt.setId(domain.getUserType().getId());
             dt.setName(domain.getUserType().getName());
             req.setUserType(dt);
