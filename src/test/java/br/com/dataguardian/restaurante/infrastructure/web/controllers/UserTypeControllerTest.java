@@ -2,7 +2,7 @@ package br.com.dataguardian.restaurante.infrastructure.web.controllers;
 
 import br.com.dataguardian.restaurante.application.ports.in.UserTypeUseCase;
 import br.com.dataguardian.restaurante.core.domain.UserType;
-import br.com.dataguardian.restaurante.infrastructure.web.dto.UserTypeRequest;
+import br.com.restaurante.infrastructure.web.dto.UserTypeRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

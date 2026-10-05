@@ -1,7 +1,6 @@
 package br.com.dataguardian.restaurante.core.services;
-
-import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteRequest;
-import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteResponse;
+import br.com.restaurante.infrastructure.web.dto.RestauranteRequest;
+import br.com.restaurante.infrastructure.web.dto.RestauranteResponse;
 import br.com.dataguardian.restaurante.infrastructure.web.dto.mapper.RestauranteConverter;
 import br.com.dataguardian.restaurante.application.usecases.RestauranteUseCase;
 import br.com.dataguardian.restaurante.application.ports.out.RestauranteRepository;

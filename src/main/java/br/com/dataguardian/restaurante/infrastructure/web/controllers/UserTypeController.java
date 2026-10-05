@@ -1,8 +1,9 @@
 package br.com.dataguardian.restaurante.infrastructure.web.controllers;
 
 import br.com.dataguardian.restaurante.application.ports.in.UserTypeUseCase;
-import br.com.dataguardian.restaurante.infrastructure.web.dto.UserType;
-import br.com.dataguardian.restaurante.infrastructure.web.dto.UserTypeRequest;
+import br.com.restaurante.infrastructure.web.controllers.UserTypeApi;
+import br.com.restaurante.infrastructure.web.dto.UserType;
+import br.com.restaurante.infrastructure.web.dto.UserTypeRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;

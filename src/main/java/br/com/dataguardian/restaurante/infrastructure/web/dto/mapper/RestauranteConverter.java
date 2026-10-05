@@ -1,8 +1,8 @@
 package br.com.dataguardian.restaurante.infrastructure.web.dto.mapper;
 
-import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteResponse;
+import br.com.restaurante.infrastructure.web.dto.RestauranteResponse;
 import br.com.dataguardian.restaurante.core.domain.Restaurante;
-import br.com.dataguardian.restaurante.infrastructure.web.dto.RestauranteRequest;
+import br.com.restaurante.infrastructure.web.dto.RestauranteRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
