@@ -41,4 +41,32 @@ public class UserService implements UserUseCase {
         user.assignType(userType);
         return userRepositoryPort.save(user);
     }
+
+    @Override
+    public User findById(Long id) {
+        return userRepositoryPort.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    @Override
+    public User update(Long id, User updatedUser) {
+        User existingUser = findById(id);
+
+        existingUser.setName(updatedUser.getName());
+
+        if (!existingUser.getEmail().equals(updatedUser.getEmail())) {
+            if (userRepositoryPort.existsByEmail(updatedUser.getEmail())) {
+                throw new IllegalArgumentException("User with this email already exists");
+            }
+            existingUser.setEmail(updatedUser.getEmail());
+        }
+
+        return userRepositoryPort.save(existingUser);
+    }
+
+    @Override
+    public void delete(Long id) {
+        User existingUser = findById(id);
+        userRepositoryPort.deleteById(existingUser.getId());
+    }
 }
