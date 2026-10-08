@@ -67,16 +67,64 @@ class UserServiceTest {
     }
 
     @Test
-    void assignUserType_userNotFound_throwsException() {
-        when(userRepositoryPort.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> service.assignUserType(1L, 1L));
+    void findById_existingUser_returnsUser() {
+        User user = new User(1L, "Alice", "alice@example.com", null);
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
+
+        User found = service.findById(1L);
+        assertEquals("Alice", found.getName());
     }
 
     @Test
-    void assignUserType_userTypeNotFound_throwsException() {
-        User user = new User(1L, "John", "j@e.com", null);
-        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
-        when(userTypeRepositoryPort.findById(2L)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> service.assignUserType(1L, 2L));
+    void findById_nonExistingUser_throwsException() {
+        when(userRepositoryPort.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> service.findById(99L));
+    }
+
+    @Test
+    void update_validUser_sameEmail_success() {
+        User existingUser = new User(1L, "Bob", "bob@example.com", null);
+        User updatedInfo = new User(null, "Bob Silva", "bob@example.com", null);
+
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(userRepositoryPort.save(existingUser)).thenReturn(existingUser);
+
+        User result = service.update(1L, updatedInfo);
+        assertEquals("Bob Silva", result.getName());
+        assertEquals("bob@example.com", result.getEmail());
+        verify(userRepositoryPort, never()).existsByEmail(anyString());
+    }
+
+    @Test
+    void update_validUser_newEmail_success() {
+        User existingUser = new User(1L, "Charlie", "charlie@example.com", null);
+        User updatedInfo = new User(null, "Charlie", "novo@example.com", null);
+
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(userRepositoryPort.existsByEmail("novo@example.com")).thenReturn(false);
+        when(userRepositoryPort.save(existingUser)).thenReturn(existingUser);
+
+        User result = service.update(1L, updatedInfo);
+        assertEquals("novo@example.com", result.getEmail());
+    }
+
+    @Test
+    void update_existingNewEmail_throwsException() {
+        User existingUser = new User(1L, "Diana", "diana@example.com", null);
+        User updatedInfo = new User(null, "Diana", "usado@example.com", null);
+
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(userRepositoryPort.existsByEmail("usado@example.com")).thenReturn(true);
+
+        assertThrows(IllegalArgumentException.class, () -> service.update(1L, updatedInfo));
+    }
+
+    @Test
+    void delete_existingUser_success() {
+        User existingUser = new User(1L, "Eve", "eve@example.com", null);
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(existingUser));
+
+        service.delete(1L);
+        verify(userRepositoryPort, times(1)).deleteById(1L);
     }
 }

@@ -1,12 +1,12 @@
 package br.com.restaurante.infrastructure.web.controllers;
 
 import br.com.restaurante.application.ports.in.UserUseCase;
+import br.com.restaurante.core.domain.User;
 import br.com.restaurante.infrastructure.web.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class UserController implements UserApi {
@@ -27,17 +27,29 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<List<UserResponse>> listUsers() {
         List<UserResponse> users = useCase.findAll().stream()
-            .map(this::toResponse)
-            .collect(Collectors.toList());
+                .map(this::toResponse)
+                .toList();
         return ResponseEntity.ok(users);
     }
 
-    @Override
-    public ResponseEntity<UserResponse> assignUserType(Long id, AssignUserTypeRequest request) {
-        br.com.restaurante.core.domain.User updated = useCase.assignUserType(id, request.getUserTypeId());
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        User user = useCase.findById(id);
+        return ResponseEntity.ok(toResponse(user));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest request) {
+        User domain = new User(id, request.getName(), request.getEmail(), null);
+        User updated = useCase.update(id, domain);
         return ResponseEntity.ok(toResponse(updated));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        useCase.delete(id);
+        return ResponseEntity.noContent().build();
+    }
     private UserResponse toResponse(br.com.restaurante.core.domain.User domain) {
         UserResponse req = new UserResponse();
         req.setId(domain.getId());

@@ -7,4 +7,7 @@ public interface UserUseCase {
     User create(User user);
     List<User> findAll();
     User assignUserType(Long userId, Long userTypeId);
+    User findById(Long id);
+    User update(Long id, User user);
+    void delete(Long id);
 }
