@@ -1,41 +1,67 @@
 services:
-  app:
+  phase2-data-guardian:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: data-guardian-app
+    image: phase2-data-guardian:latest
+    container_name: phase2-data-guardian
     restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://phase2-data-guardian-mysql:3306/db_restaurante?createDatabaseIfNotExist=true&serverTimezone=America/Sao_Paulo&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - JWT_SECRET=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
     networks:
-      - data-guardian-net
+      - phase2-data-guardian-net
     depends_on:
-      - sonarqube
+      phase2-data-guardian-mysql:
+        condition: service_healthy
+
+  phase2-data-guardian-mysql:
+    image: mysql:8.0.36
+    container_name: phase2-data-guardian-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=db_restaurante
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - phase2-data-guardian-mysql-data:/var/lib/mysql
+    networks:
+      - phase2-data-guardian-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
   sonarqube:
     image: sonarqube:community
-    container_name: data-guardian-sonarqube
+    container_name: phase2-data-guardian-sonarqube
     restart: unless-stopped
     ports:
       - "9000:9000"
     environment:
       - SONAR_JDBC_USERNAME=sonar
       - SONAR_JDBC_PASSWORD=sonar
-      - SONAR_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar
+      - SONAR_JDBC_URL=jdbc:postgresql://phase2-data-guardian-sonar-db:5432/sonar
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
     networks:
-      - data-guardian-net
+      - phase2-data-guardian-net
     depends_on:
-      - sonar-db
+      - phase2-data-guardian-sonar-db
 
-  sonar-db:
+  phase2-data-guardian-sonar-db:
     image: postgres:17-alpine
-    container_name: data-guardian-sonar-db
+    container_name: phase2-data-guardian-sonar-db
     restart: unless-stopped
     environment:
       - POSTGRES_USER=sonar
@@ -44,13 +70,14 @@ services:
     volumes:
       - sonar_db_data:/var/lib/postgresql/data
     networks:
-      - data-guardian-net
+      - phase2-data-guardian-net
 
 networks:
-  data-guardian-net:
+  phase2-data-guardian-net:
     driver: bridge
 
 volumes:
+  phase2-data-guardian-mysql-data:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:
