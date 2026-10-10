@@ -1,6 +1,9 @@
 package br.com.restaurante.core.domain;
 
 public class UserType {
+    public static final String DONO_DE_RESTAURANTE = "DONO_DE_RESTAURANTE";
+    public static final String CLIENTE = "CLIENTE";
+
     private Long id;
     private String name;
 

@@ -1,9 +1,13 @@
 package br.com.restaurante.infrastructure.web.controllers;
 
+import br.com.restaurante.core.domain.exceptions.AccessDeniedDomainException;
+import br.com.restaurante.core.domain.exceptions.InvalidCredentialsException;
+import br.com.restaurante.core.domain.exceptions.InvalidTokenException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,5 +41,40 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
         assertNotNull(res.getBody());
         assertNull(res.getBody().getDetail());
+    }
+
+    @Test
+    void handleInvalidCredentials_returns401() {
+        ResponseEntity<ProblemDetail> res = handler.handleInvalidCredentials(new InvalidCredentialsException("Credenciais inválidas"));
+        assertEquals(HttpStatus.UNAUTHORIZED, res.getStatusCode());
+        assertNotNull(res.getBody());
+        assertEquals("Credenciais inválidas", res.getBody().getDetail());
+        assertEquals("Unauthorized", res.getBody().getTitle());
+    }
+
+    @Test
+    void handleInvalidToken_returns401() {
+        ResponseEntity<ProblemDetail> res = handler.handleInvalidToken(new InvalidTokenException("Token expirado"));
+        assertEquals(HttpStatus.UNAUTHORIZED, res.getStatusCode());
+        assertNotNull(res.getBody());
+        assertEquals("Token expirado", res.getBody().getDetail());
+        assertEquals("Unauthorized", res.getBody().getTitle());
+    }
+
+    @Test
+    void handleAccessDenied_domainException_returns403() {
+        ResponseEntity<ProblemDetail> res = handler.handleAccessDenied(new AccessDeniedDomainException("Acesso restrito a Dono"));
+        assertEquals(HttpStatus.FORBIDDEN, res.getStatusCode());
+        assertNotNull(res.getBody());
+        assertEquals("Acesso restrito a Dono", res.getBody().getDetail());
+        assertEquals("Forbidden", res.getBody().getTitle());
+    }
+
+    @Test
+    void handleAccessDenied_springSecurityException_returns403() {
+        ResponseEntity<ProblemDetail> res = handler.handleAccessDenied(new AccessDeniedException("Access Denied"));
+        assertEquals(HttpStatus.FORBIDDEN, res.getStatusCode());
+        assertNotNull(res.getBody());
+        assertEquals("Access Denied", res.getBody().getDetail());
     }
 }
