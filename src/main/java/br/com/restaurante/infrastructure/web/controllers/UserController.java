@@ -19,7 +19,13 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<UserResponse> createUser(UserRequest request) {
-        br.com.restaurante.core.domain.User domain = new br.com.restaurante.core.domain.User(null, request.getName(), request.getEmail(), null);
+        br.com.restaurante.core.domain.User domain = new br.com.restaurante.core.domain.User(
+                null,
+                request.getName(),
+                request.getEmail(),
+                request.getPassword(),
+                null
+        );
         br.com.restaurante.core.domain.User created = useCase.create(domain);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(created));
     }

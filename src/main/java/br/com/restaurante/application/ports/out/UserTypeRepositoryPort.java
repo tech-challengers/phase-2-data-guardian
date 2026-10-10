@@ -7,6 +7,7 @@ import java.util.Optional;
 public interface UserTypeRepositoryPort {
     UserType save(UserType userType);
     Optional<UserType> findById(Long id);
+    Optional<UserType> findByName(String name);
     List<UserType> findAll();
     void deleteById(Long id);
     boolean existsByName(String name);
