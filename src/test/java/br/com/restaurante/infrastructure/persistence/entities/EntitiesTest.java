@@ -19,11 +19,13 @@ class EntitiesTest {
         u.setId(1L);
         u.setName("A");
         u.setEmail("B");
+        u.setPassword("pass");
         UserTypeEntity ut = new UserTypeEntity(1L, "C");
         u.setUserType(ut);
         assertEquals(1L, u.getId());
         assertEquals("A", u.getName());
         assertEquals("B", u.getEmail());
+        assertEquals("pass", u.getPassword());
         assertEquals("C", u.getUserType().getName());
     }
 }

@@ -1,6 +1,7 @@
 package br.com.restaurante.core.services;
 
 import br.com.restaurante.application.ports.in.UserUseCase;
+import br.com.restaurante.application.ports.out.PasswordEncoderPort;
 import br.com.restaurante.application.ports.out.UserRepositoryPort;
 import br.com.restaurante.application.ports.out.UserTypeRepositoryPort;
 import br.com.restaurante.core.domain.User;
@@ -11,10 +12,20 @@ public class UserService implements UserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
     private final UserTypeRepositoryPort userTypeRepositoryPort;
+    private final PasswordEncoderPort passwordEncoderPort;
 
-    public UserService(UserRepositoryPort userRepositoryPort, UserTypeRepositoryPort userTypeRepositoryPort) {
+    public UserService(
+            UserRepositoryPort userRepositoryPort,
+            UserTypeRepositoryPort userTypeRepositoryPort,
+            PasswordEncoderPort passwordEncoderPort
+    ) {
         this.userRepositoryPort = userRepositoryPort;
         this.userTypeRepositoryPort = userTypeRepositoryPort;
+        this.passwordEncoderPort = passwordEncoderPort;
+    }
+
+    public UserService(UserRepositoryPort userRepositoryPort, UserTypeRepositoryPort userTypeRepositoryPort) {
+        this(userRepositoryPort, userTypeRepositoryPort, null);
     }
 
     @Override
@@ -22,6 +33,11 @@ public class UserService implements UserUseCase {
         if (userRepositoryPort.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("User with this email already exists");
         }
+
+        if (user.getPassword() != null && !user.getPassword().isBlank() && passwordEncoderPort != null) {
+            user.setPassword(passwordEncoderPort.encode(user.getPassword()));
+        }
+
         return userRepositoryPort.save(user);
     }
 

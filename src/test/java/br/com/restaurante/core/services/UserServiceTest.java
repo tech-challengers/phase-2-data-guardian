@@ -1,5 +1,6 @@
 package br.com.restaurante.core.services;
 
+import br.com.restaurante.application.ports.out.PasswordEncoderPort;
 import br.com.restaurante.application.ports.out.UserRepositoryPort;
 import br.com.restaurante.application.ports.out.UserTypeRepositoryPort;
 import br.com.restaurante.core.domain.User;
@@ -15,24 +16,28 @@ class UserServiceTest {
 
     private UserRepositoryPort userRepositoryPort;
     private UserTypeRepositoryPort userTypeRepositoryPort;
+    private PasswordEncoderPort passwordEncoderPort;
     private UserService service;
 
     @BeforeEach
     void setUp() {
         userRepositoryPort = mock(UserRepositoryPort.class);
         userTypeRepositoryPort = mock(UserTypeRepositoryPort.class);
-        service = new UserService(userRepositoryPort, userTypeRepositoryPort);
+        passwordEncoderPort = mock(PasswordEncoderPort.class);
+        service = new UserService(userRepositoryPort, userTypeRepositoryPort, passwordEncoderPort);
     }
 
     @Test
     void create_validUser_success() {
-        User user = new User(null, "John", "john@example.com", null);
+        User user = new User(null, "John", "john@example.com", "plainPass", null);
         when(userRepositoryPort.existsByEmail("john@example.com")).thenReturn(false);
-        when(userRepositoryPort.save(user)).thenReturn(new User(1L, "John", "john@example.com", null));
+        when(passwordEncoderPort.encode("plainPass")).thenReturn("encodedPass");
+        when(userRepositoryPort.save(user)).thenReturn(new User(1L, "John", "john@example.com", "encodedPass", null));
 
         User created = service.create(user);
         assertNotNull(created.getId());
         assertEquals("john@example.com", created.getEmail());
+        assertEquals("encodedPass", user.getPassword());
     }
 
     @Test
