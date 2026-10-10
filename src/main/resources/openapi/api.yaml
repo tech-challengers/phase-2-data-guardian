@@ -21,6 +21,20 @@ paths:
                 $ref: '#/components/schemas/HealthResponse'
 
   /api/v1/restaurantes:
+    get:
+      tags:
+        - Restaurante
+      summary: Listar restaurantes
+      operationId: findAllRestaurantes
+      responses:
+        '200':
+          description: Restaurantes listados com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestauranteResponse'
     post:
       tags:
         - Restaurante
@@ -48,6 +62,66 @@ paths:
 
 
   /api/v1/restaurantes/{id}:
+    get:
+      tags:
+        - Restaurante
+      summary: Buscar restaurante por ID
+      operationId: findRestauranteById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Restaurante encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestauranteResponse'
+        '400':
+          description: Identificador do restaurante invalido
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+        '404':
+          description: Restaurante nao encontrado
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+    delete:
+      tags:
+        - Restaurante
+      summary: Excluir restaurante
+      operationId: deleteRestaurante
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '204':
+          description: Restaurante excluido com sucesso
+        '400':
+          description: Identificador do restaurante invalido
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+        '404':
+          description: Restaurante nao encontrado
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
     put:
       tags:
         - Restaurante

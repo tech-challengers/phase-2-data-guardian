@@ -1,6 +1,6 @@
 package br.com.restaurante.infrastructure.web.controllers;
 
-import br.com.restaurante.application.ports.out.RestauranteRepository;
+import br.com.restaurante.application.ports.out.RestauranteRepositoryPort;
 import br.com.restaurante.core.domain.Restaurante;
 import br.com.restaurante.core.services.RestaurantService;
 import br.com.restaurante.infrastructure.web.dto.mapper.RestauranteConverter;
@@ -22,12 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class RestauranteControllerTest {
 
-    private RestauranteRepository repository;
+    private RestauranteRepositoryPort repository;
     private MockMvc mockMvc;
 
     @BeforeEach
     void configurar() {
-        repository = mock(RestauranteRepository.class);
+        repository = mock(RestauranteRepositoryPort.class);
         RestaurantService service = new RestaurantService(repository, Mappers.getMapper(RestauranteConverter.class));
         mockMvc = MockMvcBuilders.standaloneSetup(new RestauranteController(service))
                 .setControllerAdvice(new RestauranteExceptionHandler())
@@ -36,7 +36,7 @@ class RestauranteControllerTest {
 
     @Test
     void deveRetornarRestauranteCriadoComIdGerado() throws Exception {
-        when(repository.salvar(any(Restaurante.class))).thenAnswer(invocation -> {
+        when(repository.save(any(Restaurante.class))).thenAnswer(invocation -> {
             Restaurante restaurante = invocation.getArgument(0);
             assertEquals("Restaurante da Praça", restaurante.getNome());
             assertEquals("Rua das Flores, 100", restaurante.getEndereco());
@@ -54,7 +54,7 @@ class RestauranteControllerTest {
                 .andExpect(jsonPath("$.id").value(10))
                 .andExpect(jsonPath("$.nome").value("Restaurante da Praça"));
 
-        verify(repository).salvar(any(Restaurante.class));
+        verify(repository).save(any(Restaurante.class));
     }
 
     @ParameterizedTest
