@@ -25,13 +25,12 @@ class UserPersistenceAdapterTest {
 
     @Test
     void save_success() {
-        User u = new User(null, "B", "b@b.com", "pass123", new UserType(1L, "T"));
-        UserEntity ue = new UserEntity(1L, "B", "b@b.com", "pass123", new UserTypeEntity(1L, "T"));
+        User u = new User(null, "B", "b@b.com", new UserType(1L, "T"));
+        UserEntity ue = new UserEntity(1L, "B", "b@b.com", new UserTypeEntity(1L, "T"));
         when(repository.save(any())).thenReturn(ue);
 
         User saved = adapter.save(u);
         assertEquals(1L, saved.getId());
-        assertEquals("pass123", saved.getPassword());
         assertEquals("T", saved.getUserType().getName());
     }
 
@@ -47,11 +46,9 @@ class UserPersistenceAdapterTest {
 
     @Test
     void findById_success() {
-        UserEntity ue = new UserEntity(1L, "B", "b@b.com", "pass", null);
+        UserEntity ue = new UserEntity(1L, "B", "b@b.com", null);
         when(repository.findById(1L)).thenReturn(Optional.of(ue));
-        Optional<User> found = adapter.findById(1L);
-        assertTrue(found.isPresent());
-        assertEquals("pass", found.get().getPassword());
+        assertTrue(adapter.findById(1L).isPresent());
     }
 
     @Test
