@@ -20,7 +20,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
 
-  /api/v1/restaurantes:
+    /api/v1/restaurantes:
     post:
       tags:
         - Restaurante
@@ -45,7 +45,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErroResponse'
-
 
   /api/v1/restaurantes/{id}:
     put:
@@ -87,6 +86,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErroResponse'
 
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate user and return JWT token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+
+  /api/v1/auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Extract authenticated user data from JWT token
+      operationId: getAuthenticatedUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user details extracted from token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenDataResponse'
+        '401':
+          description: Unauthorized
+
   /api/v1/user-types:
     get:
       tags:
@@ -107,6 +146,8 @@ paths:
         - UserType
       summary: Create a new user type
       operationId: createUserType
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -148,6 +189,8 @@ paths:
         - UserType
       summary: Update a user type
       operationId: updateUserType
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -175,6 +218,8 @@ paths:
         - UserType
       summary: Delete a user type
       operationId: deleteUserType
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -194,6 +239,8 @@ paths:
         - User
       summary: Get all users
       operationId: listUsers
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: OK
@@ -228,6 +275,8 @@ paths:
         - User
       summary: Assign user type to user
       operationId: assignUserType
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -252,6 +301,12 @@ paths:
           description: Not Found
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     ErroResponse:
       type: object
@@ -282,6 +337,48 @@ components:
           type: string
           format: date-time
 
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: dono@restaurante.com
+        password:
+          type: string
+          example: admin123
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          format: int64
+          example: 86400000
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    TokenDataResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          example: DONO_DE_RESTAURANTE
+
     UserType:
       type: object
       properties:
@@ -290,7 +387,7 @@ components:
           format: int64
         name:
           type: string
-          description: Example "Dono de Restaurante" or "Cliente"
+          description: Example "DONO_DE_RESTAURANTE" or "CLIENTE"
 
     UserTypeRequest:
       type: object
@@ -309,6 +406,8 @@ components:
         name:
           type: string
         email:
+          type: string
+        password:
           type: string
 
     UserResponse:

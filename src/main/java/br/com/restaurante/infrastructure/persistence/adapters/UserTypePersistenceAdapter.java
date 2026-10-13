@@ -32,6 +32,12 @@ public class UserTypePersistenceAdapter implements UserTypeRepositoryPort {
     }
 
     @Override
+    public Optional<UserType> findByName(String name) {
+        return repository.findByName(name)
+                .map(e -> new UserType(e.getId(), e.getName()));
+    }
+
+    @Override
     public List<UserType> findAll() {
         return repository.findAll().stream()
                 .map(e -> new UserType(e.getId(), e.getName()))

@@ -45,8 +45,8 @@ class UserControllerTest {
         when(useCase.create(any())).thenReturn(new User(1L, "Maria", "maria@test.com", null));
 
         mockMvc.perform(post("/api/v1/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Maria"))
@@ -64,8 +64,8 @@ class UserControllerTest {
         when(useCase.create(any())).thenThrow(new IllegalArgumentException("Email already in use"));
 
         mockMvc.perform(post("/api/v1/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("Bad Request"))
                 .andExpect(jsonPath("$.status").value(400))
@@ -95,8 +95,8 @@ class UserControllerTest {
         when(useCase.assignUserType(1L, 1L)).thenReturn(updated);
 
         mockMvc.perform(put("/api/v1/users/1/type")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userType.id").value(1L))
                 .andExpect(jsonPath("$.userType.name").value("Dono de Restaurante"));
@@ -112,11 +112,49 @@ class UserControllerTest {
         when(useCase.assignUserType(1L, 99L)).thenThrow(new IllegalArgumentException("UserType not found"));
 
         mockMvc.perform(put("/api/v1/users/1/type")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value("Not Found"))
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.detail").value("UserType not found"));
+    }
+
+    @Test
+    void getUserById_success() throws Exception {
+        User user = new User(1L, "Alice", "alice@example.com", null);
+        when(useCase.findById(1L)).thenReturn(user);
+
+        mockMvc.perform(get("/api/v1/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("Alice"));
+    }
+
+    @Test
+    void updateUser_success() throws Exception {
+        UserRequest req = new UserRequest();
+        req.setName("Alice Updated");
+        req.setEmail("alice2@example.com");
+
+        User updatedUser = new User(1L, "Alice Updated", "alice2@example.com", null);
+        when(useCase.update(eq(1L), any(User.class))).thenReturn(updatedUser);
+
+        mockMvc.perform(put("/api/v1/users/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Alice Updated"))
+                .andExpect(jsonPath("$.email").value("alice2@example.com"));
+    }
+
+    @Test
+    void deleteUser_success() throws Exception {
+        doNothing().when(useCase).delete(1L);
+
+        mockMvc.perform(delete("/api/v1/users/1"))
+                .andExpect(status().isNoContent());
+
+        verify(useCase, times(1)).delete(1L);
     }
 }

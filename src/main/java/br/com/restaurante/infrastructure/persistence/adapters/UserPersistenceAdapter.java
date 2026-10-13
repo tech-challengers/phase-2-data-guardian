@@ -26,6 +26,7 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
         entity.setId(user.getId());
         entity.setName(user.getName());
         entity.setEmail(user.getEmail());
+        entity.setPassword(user.getPassword());
 
         if (user.getUserType() != null) {
             entity.setUserType(new UserTypeEntity(user.getUserType().getId(), user.getUserType().getName()));
@@ -55,11 +56,16 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
         return repository.findByEmail(email).map(this::toDomain);
     }
 
+    @Override
+    public void deleteById(Long id) {
+        repository.deleteById(id);
+    }
+
     private User toDomain(UserEntity entity) {
         UserType ut = null;
         if (entity.getUserType() != null) {
             ut = new UserType(entity.getUserType().getId(), entity.getUserType().getName());
         }
-        return new User(entity.getId(), entity.getName(), entity.getEmail(), ut);
+        return new User(entity.getId(), entity.getName(), entity.getEmail(), entity.getPassword(), ut);
     }
 }

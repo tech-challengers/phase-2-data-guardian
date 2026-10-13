@@ -43,6 +43,16 @@ class UserTypePersistenceAdapterTest {
     }
 
     @Test
+    void findByName_success() {
+        UserTypeEntity entity = new UserTypeEntity(1L, "DONO_DE_RESTAURANTE");
+        when(repository.findByName("DONO_DE_RESTAURANTE")).thenReturn(Optional.of(entity));
+
+        Optional<UserType> ut = adapter.findByName("DONO_DE_RESTAURANTE");
+        assertTrue(ut.isPresent());
+        assertEquals("DONO_DE_RESTAURANTE", ut.get().getName());
+    }
+
+    @Test
     void findAll_success() {
         when(repository.findAll()).thenReturn(List.of(new UserTypeEntity(1L, "A")));
         List<UserType> res = adapter.findAll();
