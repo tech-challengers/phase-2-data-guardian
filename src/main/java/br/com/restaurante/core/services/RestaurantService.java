@@ -1,20 +1,26 @@
 package br.com.restaurante.core.services;
+
+import br.com.restaurante.core.domain.AuthenticatedUser;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import br.com.restaurante.infrastructure.web.dto.RestauranteRequest;
 import br.com.restaurante.infrastructure.web.dto.RestauranteResponse;
 import br.com.restaurante.infrastructure.web.dto.mapper.RestauranteConverter;
 import br.com.restaurante.application.usecases.RestaurantUseCase;
-import br.com.restaurante.application.ports.out.RestauranteRepository;
+import br.com.restaurante.application.ports.out.RestauranteRepositoryPort;
 import br.com.restaurante.core.domain.Restaurante;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.NoSuchElementException;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class RestaurantService implements RestaurantUseCase {
 
-    private final RestauranteRepository restauranteRepository;
+    private final RestauranteRepositoryPort restauranteRepositoryPort;
     private final RestauranteConverter restauranteConverter;
 
 
@@ -22,35 +28,64 @@ public class RestaurantService implements RestaurantUseCase {
     public RestauranteResponse saveRestaurant(RestauranteRequest request) {
         validarRestaurante(request);
 
+        AuthenticatedUser usuarioAutenticado = getAuthenticatedUser();
+        validateOwnerCreate(usuarioAutenticado);
+
         Restaurante restaurante = restauranteConverter.paraRestaurante(request);
-        Restaurante restauranteSalvo = restauranteRepository.save(restaurante);
+
+        // Vincula o restaurante ao proprietário autenticado
+        restaurante.setDonoId(usuarioAutenticado.getId());
+
+        Restaurante restauranteSalvo = restauranteRepositoryPort.save(restaurante);
 
         return restauranteConverter.paraResponse(restauranteSalvo);
     }
 
     @Transactional
     public RestauranteResponse updateRestaurant(Long id, RestauranteRequest request) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("Identificador do restaurante deve ser maior que zero");
-        }
+
+        Restaurante restaurante = restauranteRepositoryPort.findById(id)
+                .orElseThrow(() -> new AccessDeniedException("Restaurant not found"));
+
         validarRestaurante(request);
 
-        Restaurante restaurante = restauranteRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Restaurante não encontrado"));
+        AuthenticatedUser usuarioAutenticado = getAuthenticatedUser();
+        validateOwner(usuarioAutenticado, restaurante);
 
         restaurante.setNome(request.getNome());
         restaurante.setEndereco(request.getEndereco());
         restaurante.setGastronomia(request.getGastronomia());
         restaurante.setHorarioFuncionamento(request.getHorarioFuncionamento());
-        restaurante.setDonoId(request.getDonoId());
 
-        return restauranteConverter.paraResponse(restauranteRepository.save(restaurante));
+        return restauranteConverter.paraResponse(restauranteRepositoryPort.save(restaurante));
     }
 
-    private void validarRestaurante(RestauranteRequest request){
+    public RestauranteResponse findById(Long id) {
+        Restaurante restaurante = restauranteRepositoryPort.findById(id).orElseThrow(() -> new IllegalArgumentException("Restaurant not found"));
+        return restauranteConverter.paraResponse(restaurante);
+    }
 
-        if (request == null){
-            throw new IllegalArgumentException("Os dados são obrigatórios!");
+    public List<RestauranteResponse> findAllRestaurant() {
+        return restauranteRepositoryPort.findAll().stream().map(restauranteConverter::paraResponse).toList();
+    }
+
+    @Transactional
+    public void deleteRestaurante(Long id) {
+
+        Restaurante restaurante = restauranteRepositoryPort.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Restaurant not found"));
+
+        AuthenticatedUser usuarioAutenticado = getAuthenticatedUser();
+
+        validateOwner(usuarioAutenticado, restaurante);
+
+        restauranteRepositoryPort.deleteById(id);
+    }
+
+    private void validarRestaurante(RestauranteRequest request) {
+
+        if (request == null) {
+            throw new IllegalArgumentException("The data is mandatory!");
         }
 
         validarCampoObrigatorio(request.getNome(), "Nome");
@@ -58,15 +93,43 @@ public class RestaurantService implements RestaurantUseCase {
         validarCampoObrigatorio(request.getGastronomia(), "Gastronomia");
         validarCampoObrigatorio(request.getHorarioFuncionamento(), "Horário de Funcionamento");
 
-        if (request.getDonoId() == null || request.getDonoId() <= 0){
-            throw new IllegalArgumentException("Identificador do dono é obrigatório e deve ser maior que zero");
+    }
+
+    private void validarCampoObrigatorio(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException(campo + " is mandatory");
         }
     }
 
-    private void validarCampoObrigatorio(String valor, String campo){
-        if (valor == null || valor.isBlank()){
-            throw new IllegalArgumentException(campo + " é obrigatório");
+    private void validateOwner(AuthenticatedUser user, Restaurante restaurante) {
+
+        if (user == null || !user.isDonoDeRestaurante()){
+            throw new AccessDeniedException("You dont have permission to manage restaurants!");
         }
+
+        if (!Objects.equals(user.getId(), restaurante.getDonoId())) {
+            throw new AccessDeniedException("The restaurant doesnt belong to you.");
+        }
+    }
+
+    private void validateOwnerCreate(AuthenticatedUser user){
+
+        if (user == null || !user.isDonoDeRestaurante()){
+            throw new AccessDeniedException("You dont have permission to manage restaurants!");
+        }
+    }
+
+    private AuthenticatedUser getAuthenticatedUser() {
+        var authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        if (authentication == null ||
+                !(authentication.getPrincipal() instanceof AuthenticatedUser user)) {
+            throw new AccessDeniedException("User not authenticated.");
+        }
+
+        return user;
     }
 
 

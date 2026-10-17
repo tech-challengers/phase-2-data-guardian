@@ -1,27 +1,12 @@
 {
   "info": {
-    "_postman_id": "c85d7f21-789a-4c92-bf39-858349258901",
+    "_postman_id": "56774533-fc38-4d04-b2e2-2d0851a921bf",
     "name": "Phase 2 - Data Guardian API",
     "description": "Collection completa para testes de Autenticação JWT, Autorização baseada em UserType (DONO_DE_RESTAURANTE e CLIENTE), extração de dados do token e gestão de usuários.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43635362",
+    "_collection_link": "https://go.postman.co/collection/43635362-56774533-fc38-4d04-b2e2-2d0851a921bf?source=collection_link"
   },
-  "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:8080",
-      "type": "string"
-    },
-    {
-      "key": "bearer_token",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "client_bearer_token",
-      "value": "",
-      "type": "string"
-    }
-  ],
   "item": [
     {
       "name": "1. Autenticação",
@@ -64,10 +49,18 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Login - Cliente",
@@ -106,10 +99,18 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Login - Credenciais Inválidas (Edge Case 401)",
@@ -140,10 +141,18 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Me - Extrair Dados do Token (Dono)",
@@ -181,10 +190,18 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "auth", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Me - Extrair Dados do Token (Cliente)",
@@ -222,10 +239,18 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "auth", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -268,10 +293,17 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/user-types",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "user-types"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user-types"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Criar User Type",
@@ -312,10 +344,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/user-types",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "user-types"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user-types"
+              ]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -352,10 +391,17 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/users",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "users"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Cadastrar Usuário",
@@ -386,10 +432,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/users",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "users"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Atribuir User Type",
@@ -430,10 +483,19 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/users/1/type",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "users", "1", "type"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "1",
+                "type"
+              ]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -460,12 +522,169 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/v1/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "health"
+              ]
             }
-          }
+          },
+          "response": []
         }
       ]
+    },
+    {
+      "name": "5. Restaurantes",
+      "item": [
+        {
+          "name": "Cadastrar Restaurante",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/restaurantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "restaurantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alterar Restaurante",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/restaurantes/6",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "restaurantes",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Restaurante",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/restaurantes/6",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "restaurantes",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Restaurante",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/restaurantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "restaurantes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Restaurante por Id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/restaurantes/6",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "restaurantes",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "bearer_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "client_bearer_token",
+      "value": "",
+      "type": "string"
     }
   ]
 }
