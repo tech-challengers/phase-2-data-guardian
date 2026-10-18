@@ -1,0 +1,489 @@
+openapi: 3.0.3
+info:
+  title: Data Guardian API
+  description: Base OpenAPI definition for Data Guardian
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local Server
+
+paths:
+  /api/v1/health:
+    get:
+      summary: Health check endpoint
+      operationId: getHealthStatus
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+    /api/v1/restaurantes:
+    post:
+      tags:
+        - Restaurante
+      summary: Criar restaurante
+      operationId: criarRestaurante
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestauranteRequest'
+      responses:
+        '201':
+          description: Restaurante criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestauranteResponse'
+        '400':
+          description: Dados do restaurante inválidos
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+
+  /api/v1/restaurantes/{id}:
+    put:
+      tags:
+        - Restaurante
+      summary: Atualizar restaurante
+      operationId: updateRestaurante
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestauranteRequest'
+      responses:
+        '200':
+          description: Restaurante atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestauranteResponse'
+        '400':
+          description: Dados do restaurante inválidos
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+        '404':
+          description: Restaurante não encontrado
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate user and return JWT token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+
+  /api/v1/auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Extract authenticated user data from JWT token
+      operationId: getAuthenticatedUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user details extracted from token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenDataResponse'
+        '401':
+          description: Unauthorized
+
+  /api/v1/user-types:
+    get:
+      tags:
+        - UserType
+      summary: Get all user types
+      operationId: listUserTypes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserType'
+    post:
+      tags:
+        - UserType
+      summary: Create a new user type
+      operationId: createUserType
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTypeRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserType'
+
+  /api/v1/user-types/{id}:
+    get:
+      tags:
+        - UserType
+      summary: Get user type by ID
+      operationId: getUserTypeById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserType'
+        '404':
+          description: Not Found
+    put:
+      tags:
+        - UserType
+      summary: Update a user type
+      operationId: updateUserType
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTypeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserType'
+        '404':
+          description: Not Found
+    delete:
+      tags:
+        - UserType
+      summary: Delete a user type
+      operationId: deleteUserType
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+
+  /api/v1/users:
+    get:
+      tags:
+        - User
+      summary: Get all users
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+    post:
+      tags:
+        - User
+      summary: Create a newly user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /api/v1/users/{id}/type:
+    put:
+      tags:
+        - User
+      summary: Assign user type to user
+      operationId: assignUserType
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignUserTypeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Not Found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErroResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          example: about:blank
+        title:
+          type: string
+          example: Dados do restaurante inválidos
+        status:
+          type: integer
+          example: 400
+        detail:
+          type: string
+          example: Nome é obrigatório
+        instance:
+          type: string
+          example: /api/v1/restaurantes
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: UP
+        timestamp:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: dono@restaurante.com
+        password:
+          type: string
+          example: admin123
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          format: int64
+          example: 86400000
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    TokenDataResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          example: DONO_DE_RESTAURANTE
+
+    UserType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: Example "DONO_DE_RESTAURANTE" or "CLIENTE"
+
+    UserTypeRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    UserRequest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        userType:
+          $ref: '#/components/schemas/UserType'
+
+    AssignUserTypeRequest:
+      type: object
+      required:
+        - userTypeId
+      properties:
+        userTypeId:
+          type: integer
+          format: int64
+    RestauranteRequest:
+      type: object
+      required:
+        - nome
+        - endereco
+        - gastronomia
+        - horarioFuncionamento
+        - donoId
+      properties:
+        nome:
+          type: string
+          minLength: 1
+          example: Restaurante da Praça
+        endereco:
+          type: string
+          minLength: 1
+          example: Rua das Flores, 100
+        gastronomia:
+          type: string
+          minLength: 1
+          example: Brasileira
+        horarioFuncionamento:
+          type: string
+          minLength: 1
+          example: "11:00 às 22:00"
+        donoId:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 1
+
+    RestauranteResponse:
+      type: object
+      required:
+        - id
+        - nome
+        - endereco
+        - gastronomia
+        - horarioFuncionamento
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        nome:
+          type: string
+          example: Restaurante da Praça
+        endereco:
+          type: string
+          example: Rua das Flores, 100
+        gastronomia:
+          type: string
+          example: Brasileira
+        horarioFuncionamento:
+          type: string
+          example: "11:00 às 22:00"
