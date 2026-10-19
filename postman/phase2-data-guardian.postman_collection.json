@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "56774533-fc38-4d04-b2e2-2d0851a921bf",
+    "_postman_id": "574a3cc4-731f-4eb5-92c7-5253b182a091",
     "name": "Phase 2 - Data Guardian API",
-    "description": "Collection completa para testes de Autenticação JWT, Autorização baseada em UserType (DONO_DE_RESTAURANTE e CLIENTE), extração de dados do token e gestão de usuários.",
+    "description": "Collection completa para testes de Autenticação JWT, Autorização baseada em UserType (DONO_DE_RESTAURANTE e CLIENTE) e gestão de recursos.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "43635362",
-    "_collection_link": "https://go.postman.co/collection/43635362-56774533-fc38-4d04-b2e2-2d0851a921bf?source=collection_link"
+    "_exporter_id": "49807694",
+    "_collection_link": "https://go.postman.co/collection/49807694-574a3cc4-731f-4eb5-92c7-5253b182a091?source=collection_link"
   },
   "item": [
     {
@@ -17,25 +17,17 @@
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "var jsonData = pm.response.json();",
-                  "pm.test(\"Token retornado com sucesso\", function () {",
-                  "    pm.expect(jsonData.accessToken).to.be.a('string');",
-                  "    pm.expect(jsonData.tokenType).to.eql('Bearer');",
-                  "    pm.collectionVariables.set(\"bearer_token\", jsonData.accessToken);",
-                  "});",
-                  "pm.test(\"UserType é DONO_DE_RESTAURANTE\", function () {",
-                  "    pm.expect(jsonData.user.userType.name).to.eql('DONO_DE_RESTAURANTE');",
-                  "});"
-                ],
-                "type": "text/javascript"
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\nvar jsonData = pm.response.json();\npm.test(\"Token retornado com sucesso\", function () {\n    pm.expect(jsonData.accessToken).to.be.a('string');\n    pm.expect(jsonData.tokenType).to.eql('Bearer');\n    if (pm.environment) {\n        pm.environment.set(\"token\", jsonData.accessToken);\n        pm.environment.set(\"bearer_token\", jsonData.accessToken);\n    }\n    pm.collectionVariables.set(\"token\", jsonData.accessToken);\n    pm.collectionVariables.set(\"bearer_token\", jsonData.accessToken);\n    pm.globals.set(\"token\", jsonData.accessToken);\n    pm.globals.set(\"bearer_token\", jsonData.accessToken);\n});\npm.test(\"UserType é DONO_DE_RESTAURANTE\", function () {\n    pm.expect(jsonData.user.userType.name).to.eql('DONO_DE_RESTAURANTE');\n});"
+                ]
               }
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -45,7 +37,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"dono@restaurante.com\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\n  \"email\": \"dono@restaurante.com\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/login",
@@ -75,7 +72,15 @@
                   "var jsonData = pm.response.json();",
                   "pm.test(\"Token retornado com sucesso\", function () {",
                   "    pm.expect(jsonData.accessToken).to.be.a('string');",
-                  "    pm.collectionVariables.set(\"client_bearer_token\", jsonData.accessToken);",
+                  "    pm.expect(jsonData.tokenType).to.eql('Bearer');",
+                  "    if (pm.environment) {",
+                  "        pm.environment.set(\"token\", jsonData.accessToken);",
+                  "        pm.environment.set(\"bearer_token\", jsonData.accessToken);",
+                  "    }",
+                  "    pm.collectionVariables.set(\"token\", jsonData.accessToken);",
+                  "    pm.collectionVariables.set(\"bearer_token\", jsonData.accessToken);",
+                  "    pm.globals.set(\"token\", jsonData.accessToken);",
+                  "    pm.globals.set(\"bearer_token\", jsonData.accessToken);",
                   "});",
                   "pm.test(\"UserType é CLIENTE\", function () {",
                   "    pm.expect(jsonData.user.userType.name).to.eql('CLIENTE');",
@@ -86,6 +91,9 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -128,6 +136,9 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -149,104 +160,6 @@
                 "v1",
                 "auth",
                 "login"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Me - Extrair Dados do Token (Dono)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "var jsonData = pm.response.json();",
-                  "pm.test(\"Claims extraídas do token corretamente\", function () {",
-                  "    pm.expect(jsonData.userId).to.be.a('number');",
-                  "    pm.expect(jsonData.email).to.eql('dono@restaurante.com');",
-                  "    pm.expect(jsonData.role).to.eql('DONO_DE_RESTAURANTE');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "me"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Me - Extrair Dados do Token (Cliente)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "var jsonData = pm.response.json();",
-                  "pm.test(\"Claims extraídas para cliente\", function () {",
-                  "    pm.expect(jsonData.userId).to.be.a('number');",
-                  "    pm.expect(jsonData.email).to.eql('cliente@email.com');",
-                  "    pm.expect(jsonData.role).to.eql('CLIENTE');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{client_bearer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "me"
               ]
             }
           },
@@ -279,16 +192,6 @@
             }
           ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -306,41 +209,49 @@
           "response": []
         },
         {
-          "name": "Criar User Type",
+          "name": "Get User Type",
           "event": [
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 201\", function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});"
-                ],
-                "type": "text/javascript"
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\nvar jsonData = pm.response.json();\npm.test(\"Contém os 2 UserTypes inseridos no startup\", function () {\n    var names = jsonData.map(t => t.name);\n    pm.expect(names).to.include('DONO_DE_RESTAURANTE');\n    pm.expect(names).to.include('CLIENTE');\n});"
+                ]
               }
             }
           ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}",
-                  "type": "string"
-                }
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/user-types/2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user-types",
+                "2"
               ]
-            },
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User Type",
+          "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"ADMINISTRADOR\"\n}"
+              "raw": "{\r\n    \"name\": \"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/user-types",
@@ -351,6 +262,42 @@
                 "api",
                 "v1",
                 "user-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User Type",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/user-types/3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user-types",
+                "3"
               ]
             }
           },
@@ -377,16 +324,6 @@
             }
           ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -419,6 +356,9 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -460,16 +400,6 @@
             }
           ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "PUT",
             "header": [
               {
@@ -518,6 +448,9 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -543,7 +476,16 @@
           "name": "Cadastrar Restaurante",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Restaurante Sabor Brasileiro\",\n  \"endereco\": \"Av. Paulista, 1000 - Bela Vista, São Paulo - SP\",\n  \"gastronomia\": \"Brasileira\",\n  \"horarioFuncionamento\": \"11:00 às 23:00\",\n  \"donoId\": 1\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/api/v1/restaurantes",
               "host": [
@@ -562,7 +504,16 @@
           "name": "Alterar Restaurante",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Restaurante Sabor Brasileiro Atualizado\",\n  \"endereco\": \"Av. Paulista, 1000 - Bela Vista, São Paulo - SP\",\n  \"gastronomia\": \"Brasileira Contemporânea\",\n  \"horarioFuncionamento\": \"11:00 às 00:00\",\n  \"donoId\": 1\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/api/v1/restaurantes/6",
               "host": [
@@ -581,16 +532,6 @@
         {
           "name": "Deletar Restaurante",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -611,16 +552,6 @@
         {
           "name": "Listar Restaurante",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -640,16 +571,6 @@
         {
           "name": "Buscar Restaurante por Id",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -670,6 +591,16 @@
       ]
     }
   ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
   "variable": [
     {
       "key": "baseUrl",
@@ -677,12 +608,12 @@
       "type": "string"
     },
     {
-      "key": "bearer_token",
+      "key": "token",
       "value": "",
       "type": "string"
     },
     {
-      "key": "client_bearer_token",
+      "key": "bearer_token",
       "value": "",
       "type": "string"
     }

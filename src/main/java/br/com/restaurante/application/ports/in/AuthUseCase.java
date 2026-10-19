@@ -10,5 +10,6 @@ public interface AuthUseCase {
             String tokenType,
             Long expiresIn,
             User user
-    ) {}
+    ) {
+    }
 }
