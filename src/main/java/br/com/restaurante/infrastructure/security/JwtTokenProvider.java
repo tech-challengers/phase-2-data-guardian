@@ -9,6 +9,9 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +21,10 @@ import java.time.Instant;
 import java.util.Date;
 
 @Component
+@Getter
 public class JwtTokenProvider implements TokenPort {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     private final SecretKey key;
     private final long expirationMs;
@@ -57,12 +63,12 @@ public class JwtTokenProvider implements TokenPort {
     public AuthenticatedUser extractTokenData(String token) {
         Claims claims = parseClaims(token);
 
-        Long userId;
+        long userId;
         Object userIdClaim = claims.get("userId");
         if (userIdClaim instanceof Number number) {
             userId = number.longValue();
         } else if (claims.getSubject() != null) {
-            userId = Long.valueOf(claims.getSubject());
+            userId = Long.parseLong(claims.getSubject());
         } else {
             throw new InvalidTokenException("Token does not contain user ID");
         }
@@ -80,6 +86,8 @@ public class JwtTokenProvider implements TokenPort {
             parseClaims(token);
             return true;
         } catch (InvalidTokenException e) {
+            log.warn("Falha na validação do token JWT: [{}]. Motivo: {}", 
+                    maskToken(token), e.getMessage());
             return false;
         }
     }
@@ -90,6 +98,10 @@ public class JwtTokenProvider implements TokenPort {
         }
 
         String sanitizedToken = token.startsWith("Bearer ") ? token.substring(7).trim() : token.trim();
+        // Remove aspas acidentais se o token foi passado com aspas no header ou variável
+        if (sanitizedToken.startsWith("\"") && sanitizedToken.endsWith("\"") && sanitizedToken.length() > 1) {
+            sanitizedToken = sanitizedToken.substring(1, sanitizedToken.length() - 1).trim();
+        }
 
         try {
             return Jwts.parser()
@@ -104,7 +116,10 @@ public class JwtTokenProvider implements TokenPort {
         }
     }
 
-    public long getExpirationMs() {
-        return expirationMs;
+    private String maskToken(String token) {
+        if (token == null) return "null";
+        String trimmed = token.trim();
+        if (trimmed.length() <= 20) return trimmed;
+        return trimmed.substring(0, 10) + "..." + trimmed.substring(trimmed.length() - 10);
     }
 }

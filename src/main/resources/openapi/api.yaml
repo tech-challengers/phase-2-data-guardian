@@ -178,24 +178,6 @@ paths:
         '401':
           description: Invalid credentials
 
-  /api/v1/auth/me:
-    get:
-      tags:
-        - Auth
-      summary: Extract authenticated user data from JWT token
-      operationId: getAuthenticatedUser
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Authenticated user details extracted from token
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenDataResponse'
-        '401':
-          description: Unauthorized
-
   /api/v1/user-types:
     get:
       tags:
@@ -434,20 +416,6 @@ components:
           example: 86400000
         user:
           $ref: '#/components/schemas/UserResponse'
-
-    TokenDataResponse:
-      type: object
-      properties:
-        userId:
-          type: integer
-          format: int64
-        email:
-          type: string
-        name:
-          type: string
-        role:
-          type: string
-          example: DONO_DE_RESTAURANTE
 
     UserType:
       type: object

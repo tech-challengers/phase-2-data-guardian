@@ -1,27 +1,19 @@
 package br.com.restaurante.infrastructure.web.controllers;
 
 import br.com.restaurante.application.ports.in.AuthUseCase;
-import br.com.restaurante.application.ports.in.TokenUseCase;
-import br.com.restaurante.core.domain.AuthenticatedUser;
-import br.com.restaurante.infrastructure.security.SecurityContextHelper;
 import br.com.restaurante.infrastructure.web.dto.LoginRequest;
 import br.com.restaurante.infrastructure.web.dto.LoginResponse;
-import br.com.restaurante.infrastructure.web.dto.TokenDataResponse;
 import br.com.restaurante.infrastructure.web.dto.UserResponse;
 import br.com.restaurante.infrastructure.web.dto.UserType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class AuthController implements AuthApi {
 
     private final AuthUseCase authUseCase;
-    private final TokenUseCase tokenUseCase;
-
-    public AuthController(AuthUseCase authUseCase, TokenUseCase tokenUseCase) {
-        this.authUseCase = authUseCase;
-        this.tokenUseCase = tokenUseCase;
-    }
 
     @Override
     public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
@@ -44,17 +36,6 @@ public class AuthController implements AuthApi {
         }
         response.setUser(userResponse);
 
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<TokenDataResponse> getAuthenticatedUser() {
-        AuthenticatedUser user = SecurityContextHelper.getRequiredAuthenticatedUser();
-        TokenDataResponse response = new TokenDataResponse();
-        response.setUserId(user.getId());
-        response.setEmail(user.getEmail());
-        response.setName(user.getName());
-        response.setRole(user.getRole());
         return ResponseEntity.ok(response);
     }
 }
