@@ -4,14 +4,18 @@ import br.com.restaurante.application.ports.in.AuthUseCase;
 import br.com.restaurante.application.ports.in.TokenUseCase;
 import br.com.restaurante.application.ports.in.UserTypeUseCase;
 import br.com.restaurante.application.ports.in.UserUseCase;
+import br.com.restaurante.application.ports.in.MenuItemUseCase;
 import br.com.restaurante.application.ports.out.PasswordEncoderPort;
 import br.com.restaurante.application.ports.out.TokenPort;
 import br.com.restaurante.application.ports.out.UserRepositoryPort;
 import br.com.restaurante.application.ports.out.UserTypeRepositoryPort;
+import br.com.restaurante.application.ports.out.MenuItemRepositoryPort;
+import br.com.restaurante.application.ports.out.RestauranteRepositoryPort;
 import br.com.restaurante.core.services.AuthService;
 import br.com.restaurante.core.services.TokenService;
 import br.com.restaurante.core.services.UserService;
 import br.com.restaurante.core.services.UserTypeService;
+import br.com.restaurante.core.services.MenuItemService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,4 +51,13 @@ public class UseCaseConfig {
     public TokenUseCase tokenUseCase(TokenPort tokenPort) {
         return new TokenService(tokenPort);
     }
+
+    @Bean
+    public MenuItemUseCase menuItemUseCase(
+            MenuItemRepositoryPort menuItemPort,
+            RestauranteRepositoryPort restaurantePort
+    ) {
+        return new MenuItemService(menuItemPort, restaurantePort);
+    }
 }
+
