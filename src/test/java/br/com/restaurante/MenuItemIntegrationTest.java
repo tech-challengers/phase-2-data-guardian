@@ -103,7 +103,6 @@ class MenuItemIntegrationTest extends AbstractMySqlIntegrationTest {
         long itemId = itemIdNumber.longValue();
         String itemPath = "/api/v1/menu-items/" + itemId;
 
-        // leitura pública (sem token)
         mockMvc.perform(get(itemsPath))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
@@ -111,7 +110,6 @@ class MenuItemIntegrationTest extends AbstractMySqlIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Feijoada"));
 
-        // cliente não edita nem apaga -> 403
         mockMvc.perform(put(itemPath)
                         .header("Authorization", cliente)
                         .contentType(MediaType.APPLICATION_JSON)
