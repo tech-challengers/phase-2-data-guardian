@@ -8,12 +8,14 @@ import br.com.restaurante.infrastructure.web.dto.UserRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,6 +55,25 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.email").value("maria@test.com"));
 
         verify(useCase, times(1)).create(any());
+    }
+
+    @Test
+    void createUser_passesPasswordToUseCase() throws Exception {
+        UserRequest req = new UserRequest();
+        req.setName("Maria");
+        req.setEmail("maria@test.com");
+        req.setPassword("senha123");
+
+        when(useCase.create(any())).thenReturn(new User(1L, "Maria", "maria@test.com", null));
+
+        mockMvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isCreated());
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(useCase).create(captor.capture());
+        assertEquals("senha123", captor.getValue().getPassword());
     }
 
     @Test
