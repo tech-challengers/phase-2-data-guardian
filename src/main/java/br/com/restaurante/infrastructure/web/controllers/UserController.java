@@ -22,7 +22,7 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<UserResponse> createUser(UserRequest request) {
-        User domain = new User(null, request.getName(), request.getEmail(), null);
+        User domain = new User(null, request.getName(), request.getEmail(), request.getPassword(), null);
         User created = useCase.create(domain);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(created));
     }
