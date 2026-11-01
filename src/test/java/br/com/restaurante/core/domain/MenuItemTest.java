@@ -3,13 +3,14 @@ package br.com.restaurante.core.domain;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MenuItemTest {
 
     private MenuItem valid() {
-        return new MenuItem(1L, 10L, "Feijoada", "Completa",
+        return new MenuItem(UUID.fromString("19a22ca6-f895-4eec-9111-537f7a6670a4"), 10L, "Feijoada", "Completa",
                 new BigDecimal("49.90"), false, "/img/f.jpg");
     }
 
@@ -17,7 +18,7 @@ class MenuItemTest {
     void shouldCreateValidItem() {
         MenuItem item = valid();
 
-        assertEquals(1L, item.getId());
+        assertEquals(UUID.fromString("19a22ca6-f895-4eec-9111-537f7a6670a4"), item.getId());
         assertEquals(10L, item.getRestaurantId());
         assertEquals("Feijoada", item.getName());
         assertEquals("Completa", item.getDescription());

@@ -1,18 +1,44 @@
 package br.com.restaurante.application.ports.in;
 
 import br.com.restaurante.core.domain.MenuItem;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface MenuItemUseCase {
 
+    /**
+     * Cria um item de menu informando a URL externa da foto (ou sem foto).
+     */
     MenuItem create(Long userId, Long restaurantId, MenuItem item);
+
+    /**
+     * Cria um item de menu recebendo o arquivo de imagem, persistindo-o no Firebase Storage.
+     */
+    MenuItem createWithPhoto(Long userId, Long restaurantId, MenuItem item, MultipartFile photo);
 
     List<MenuItem> findByRestaurantId(Long restaurantId);
 
-    MenuItem findById(Long id);
+    MenuItem findById(UUID id);
 
-    MenuItem update(Long userId, Long id, MenuItem data);
+    /**
+     * Atualiza os dados do item. Se o item tinha foto no Firebase e agora possui outra URL, remove a anterior.
+     */
+    MenuItem update(Long userId, UUID menuItemId, MenuItem data);
 
-    void delete(Long userId, Long id);
+    /**
+     * Exclui o item e remove a foto do storage caso ela pertença ao Firebase Storage.
+     */
+    void delete(Long userId, UUID menuItemId);
+
+    /**
+     * Faz upload/substituição avulsa da foto de um item existente.
+     */
+    MenuItem uploadPhoto(Long userId, UUID menuItemId, MultipartFile photo);
+
+    /**
+     * Remove a foto do item do storage e define photoPath como null no banco.
+     */
+    MenuItem deletePhoto(Long userId, UUID menuItemId);
 }

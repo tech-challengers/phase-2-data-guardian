@@ -1,10 +1,11 @@
 package br.com.restaurante.core.domain;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class MenuItem {
 
-    private Long id;
+    private UUID id;
     private Long restaurantId;
     private String name;
     private String description;
@@ -12,7 +13,7 @@ public class MenuItem {
     private boolean dineInOnly;
     private String photoPath;
 
-    public MenuItem(Long id, Long restaurantId, String name, String description,
+    public MenuItem(UUID id, Long restaurantId, String name, String description,
                     BigDecimal price, boolean dineInOnly, String photoPath) {
         validate(name, price);
         this.id = id;
@@ -43,11 +44,31 @@ public class MenuItem {
         }
     }
 
-    public Long getId() { return id; }
-    public Long getRestaurantId() { return restaurantId; }
-    public String getName() { return name; }
-    public String getDescription() { return description; }
-    public BigDecimal getPrice() { return price; }
-    public boolean isDineInOnly() { return dineInOnly; }
-    public String getPhotoPath() { return photoPath; }
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getRestaurantId() {
+        return restaurantId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public boolean isDineInOnly() {
+        return dineInOnly;
+    }
+
+    public String getPhotoPath() {
+        return photoPath;
+    }
 }

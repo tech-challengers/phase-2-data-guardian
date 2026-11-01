@@ -2,8 +2,10 @@ package br.com.restaurante.infrastructure.persistence.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "item_cardapio")
@@ -15,8 +17,10 @@ import java.math.BigDecimal;
 public class MenuItemEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME) // Garante a geração monotônica (UUIDv7)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "restaurante_id", nullable = false)
     private Long restaurantId;

@@ -2,6 +2,7 @@ package br.com.restaurante.infrastructure.persistence.adapters;
 
 import br.com.restaurante.application.ports.out.MenuItemRepositoryPort;
 import br.com.restaurante.core.domain.MenuItem;
+import br.com.restaurante.core.domain.exceptions.MenuItemExistingException;
 import br.com.restaurante.infrastructure.persistence.entities.MenuItemEntity;
 import br.com.restaurante.infrastructure.persistence.repositories.SpringMenuItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class MenuItemPersistenceAdapter implements MenuItemRepositoryPort {
     }
 
     @Override
-    public Optional<MenuItem> findById(Long id) {
+    public Optional<MenuItem> findById(UUID id) {
         return repository.findById(id).map(this::toDomain);
     }
 
@@ -34,8 +36,16 @@ public class MenuItemPersistenceAdapter implements MenuItemRepositoryPort {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public void existsByName(String name, Long restaurantId) {
+        repository.findByNameAndRestaurantId(name, restaurantId)
+                .ifPresent(_ -> {
+                    throw new MenuItemExistingException("This menu item already exists");
+                });
     }
 
     private MenuItem toDomain(MenuItemEntity entity) {
