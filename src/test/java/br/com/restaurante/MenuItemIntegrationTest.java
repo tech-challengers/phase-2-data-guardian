@@ -147,4 +147,65 @@ class MenuItemIntegrationTest extends AbstractMySqlIntegrationTest {
         mockMvc.perform(get(itemPath))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void duplicateMenuItemNamesAreRejectedWithinSameRestaurant() throws Exception {
+        String dono = login("dono@restaurante.com", "admin123");
+        long restaurantId = createRestaurant(dono);
+        long otherRestaurantId = createRestaurant(dono);
+        String itemsPath = "/api/v1/restaurants/" + restaurantId + "/menu-items";
+        String otherItemsPath = "/api/v1/restaurants/" + otherRestaurantId + "/menu-items";
+
+        // primeiro item -> 201
+        MvcResult first = mockMvc.perform(post(itemsPath)
+                        .header("Authorization", dono)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(itemBody("Feijoada", "49.90")))
+                .andExpect(status().isCreated())
+                .andReturn();
+        long firstId = ((Number) JsonPath.read(first.getResponse().getContentAsString(), "$.id")).longValue();
+
+        mockMvc.perform(post(itemsPath)
+                        .header("Authorization", dono)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(itemBody("Feijoada", "39.90")))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post(itemsPath)
+                        .header("Authorization", dono)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(itemBody("FEIJOADA", "39.90")))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post(otherItemsPath)
+                        .header("Authorization", dono)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(itemBody("Feijoada", "49.90")))
+                .andExpect(status().isCreated());
+
+        MvcResult second = mockMvc.perform(post(itemsPath)
+                        .header("Authorization", dono)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(itemBody("Moqueca", "59.00")))
+                .andExpect(status().isCreated())
+                .andReturn();
+        long secondId = ((Number) JsonPath.read(second.getResponse().getContentAsString(), "$.id")).longValue();
+
+        mockMvc.perform(put("/api/v1/menu-items/" + secondId)
+                        .header("Authorization", dono)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(itemBody("Feijoada", "59.00")))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(put("/api/v1/menu-items/" + firstId)
+                        .header("Authorization", dono)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(itemBody("Feijoada", "55.00")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.price").value(55.00));
+
+        mockMvc.perform(get(itemsPath))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
 }

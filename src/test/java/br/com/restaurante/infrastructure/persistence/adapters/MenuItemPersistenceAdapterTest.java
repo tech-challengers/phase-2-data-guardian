@@ -102,6 +102,27 @@ class MenuItemPersistenceAdapterTest {
     }
 
     @Test
+    void findByRestaurantIdAndName_found() {
+        when(repository.findByRestaurantIdAndNameIgnoreCase(10L, "Feijoada"))
+                .thenReturn(Optional.of(entity()));
+
+        Optional<MenuItem> found = adapter.findByRestaurantIdAndName(10L, "Feijoada");
+
+        assertTrue(found.isPresent());
+        assertEquals(100L, found.get().getId());
+        assertEquals("Feijoada", found.get().getName());
+        assertEquals(10L, found.get().getRestaurantId());
+    }
+
+    @Test
+    void findByRestaurantIdAndName_notFound() {
+        when(repository.findByRestaurantIdAndNameIgnoreCase(10L, "Inexistente"))
+                .thenReturn(Optional.empty());
+
+        assertTrue(adapter.findByRestaurantIdAndName(10L, "Inexistente").isEmpty());
+    }
+
+    @Test
     void deleteById_delegatesToRepository() {
         adapter.deleteById(100L);
 

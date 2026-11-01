@@ -23,6 +23,7 @@ public class MenuItemService implements MenuItemUseCase {
     @Override
     public MenuItem create(Long userId, Long restaurantId, MenuItem item) {
         checkOwner(userId, restaurantId);
+        checkNameAvailable(restaurantId, item.getName(), null);
         return menuItemRepositoryPort.save(item);
     }
 
@@ -41,6 +42,7 @@ public class MenuItemService implements MenuItemUseCase {
     public MenuItem update(Long userId, Long id, MenuItem data) {
         MenuItem item = findById(id);
         checkOwner(userId, item.getRestaurantId());
+        checkNameAvailable(item.getRestaurantId(), data.getName(), id);
         item.update(data.getName(), data.getDescription(), data.getPrice(),
                 data.isDineInOnly(), data.getPhotoPath());
         return menuItemRepositoryPort.save(item);
@@ -59,5 +61,17 @@ public class MenuItemService implements MenuItemUseCase {
         if (!restaurante.getDonoId().equals(userId)) {
             throw new AccessDeniedDomainException("Only the restaurant owner can manage its menu");
         }
+    }
+
+    private void checkNameAvailable(Long restaurantId, String name, Long ignoreItemId) {
+        if (name == null) {
+            return; 
+        }
+        menuItemRepositoryPort.findByRestaurantIdAndName(restaurantId, name.trim())
+                .filter(existing -> !existing.getId().equals(ignoreItemId))
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException(
+                            "A menu item with this name already exists in this restaurant");
+                });
     }
 }

@@ -52,7 +52,7 @@ class MenuItemServiceTest {
                 new BigDecimal("59.00"), true, "/img/m.jpg");
     }
 
-    // ---------- create ----------
+    // create
 
     @Test
     void createShouldSaveWhenUserIsOwner() {
@@ -87,7 +87,52 @@ class MenuItemServiceTest {
         verify(menuItemRepositoryPort, never()).save(any());
     }
 
-    // ---------- reads ----------
+    @Test
+    void createShouldFailWhenNameAlreadyExistsInRestaurant() {
+        MenuItem duplicate = new MenuItem(200L, RESTAURANT_ID, "Moqueca", "Outra",
+                new BigDecimal("10.00"), false, null);
+        when(restauranteRepositoryPort.findById(RESTAURANT_ID)).thenReturn(Optional.of(restaurante));
+        when(menuItemRepositoryPort.findByRestaurantIdAndName(RESTAURANT_ID, "Moqueca"))
+                .thenReturn(Optional.of(duplicate));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.create(OWNER_ID, RESTAURANT_ID, newItem()));
+
+        assertTrue(ex.getMessage().contains("already exists"));
+        verify(menuItemRepositoryPort, never()).save(any());
+    }
+
+    @Test
+    void createShouldIgnoreSurroundingSpacesWhenCheckingDuplicateName() {
+        MenuItem withSpaces = new MenuItem(null, RESTAURANT_ID, "  Moqueca  ", "Capixaba",
+                new BigDecimal("59.00"), true, null);
+        MenuItem duplicate = new MenuItem(200L, RESTAURANT_ID, "Moqueca", "Outra",
+                new BigDecimal("10.00"), false, null);
+        when(restauranteRepositoryPort.findById(RESTAURANT_ID)).thenReturn(Optional.of(restaurante));
+        when(menuItemRepositoryPort.findByRestaurantIdAndName(RESTAURANT_ID, "Moqueca"))
+                .thenReturn(Optional.of(duplicate));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.create(OWNER_ID, RESTAURANT_ID, withSpaces));
+
+        verify(menuItemRepositoryPort, never()).save(any());
+    }
+
+    @Test
+    void createShouldSaveWhenNameIsFreeInThisRestaurant() {
+        MenuItem item = newItem();
+        when(restauranteRepositoryPort.findById(RESTAURANT_ID)).thenReturn(Optional.of(restaurante));
+        when(menuItemRepositoryPort.findByRestaurantIdAndName(RESTAURANT_ID, "Moqueca"))
+                .thenReturn(Optional.empty());
+        when(menuItemRepositoryPort.save(item)).thenReturn(item);
+
+        assertSame(item, service.create(OWNER_ID, RESTAURANT_ID, item));
+
+        verify(menuItemRepositoryPort).findByRestaurantIdAndName(RESTAURANT_ID, "Moqueca");
+        verify(menuItemRepositoryPort).save(item);
+    }
+
+    // read
 
     @Test
     void findByRestaurantIdShouldReturnItems() {
@@ -123,7 +168,7 @@ class MenuItemServiceTest {
         assertTrue(ex.getMessage().toLowerCase().contains("not found"));
     }
 
-    // ---------- update ----------
+    // update
 
     @Test
     void updateShouldChangeFieldsWhenUserIsOwner() {
@@ -174,7 +219,41 @@ class MenuItemServiceTest {
         verify(menuItemRepositoryPort, never()).save(any());
     }
 
-    // ---------- delete ----------
+    @Test
+    void updateShouldFailWhenNameBelongsToAnotherItem() {
+        MenuItem other = new MenuItem(200L, RESTAURANT_ID, "Moqueca", "Outra",
+                new BigDecimal("10.00"), false, null);
+        when(menuItemRepositoryPort.findById(ITEM_ID)).thenReturn(Optional.of(existing));
+        when(restauranteRepositoryPort.findById(RESTAURANT_ID)).thenReturn(Optional.of(restaurante));
+        when(menuItemRepositoryPort.findByRestaurantIdAndName(RESTAURANT_ID, "Moqueca"))
+                .thenReturn(Optional.of(other));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.update(OWNER_ID, ITEM_ID, newItem()));
+
+        assertTrue(ex.getMessage().contains("already exists"));
+        assertEquals("Feijoada", existing.getName());
+        verify(menuItemRepositoryPort, never()).save(any());
+    }
+
+    @Test
+    void updateShouldAllowKeepingTheSameName() {
+        MenuItem sameName = new MenuItem(null, RESTAURANT_ID, "Feijoada", "Nova descrição",
+                new BigDecimal("55.00"), false, null);
+        when(menuItemRepositoryPort.findById(ITEM_ID)).thenReturn(Optional.of(existing));
+        when(restauranteRepositoryPort.findById(RESTAURANT_ID)).thenReturn(Optional.of(restaurante));
+        when(menuItemRepositoryPort.findByRestaurantIdAndName(RESTAURANT_ID, "Feijoada"))
+                .thenReturn(Optional.of(existing));
+        when(menuItemRepositoryPort.save(any(MenuItem.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        MenuItem result = service.update(OWNER_ID, ITEM_ID, sameName);
+
+        assertEquals("Feijoada", result.getName());
+        assertEquals(new BigDecimal("55.00"), result.getPrice());
+        verify(menuItemRepositoryPort).save(existing);
+    }
+
+    // delete
 
     @Test
     void deleteShouldRemoveWhenUserIsOwner() {

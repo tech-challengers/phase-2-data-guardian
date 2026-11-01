@@ -13,5 +13,7 @@ public interface MenuItemRepositoryPort {
 
     List<MenuItem> findByRestaurantId(Long restaurantId);
 
+    Optional<MenuItem> findByRestaurantIdAndName(Long restaurantId, String name);
+
     void deleteById(Long id);
 }

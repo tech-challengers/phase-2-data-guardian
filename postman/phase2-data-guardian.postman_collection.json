@@ -630,6 +630,29 @@
           "response": []
         },
         {
+          "name": "Criar item com nome duplicado - 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test(\"400\", function () { pm.response.to.have.status(400); });",
+            "pm.test(\"Mensagem indica nome já existente\", function () { pm.expect(pm.response.text()).to.include('already exists'); });"
+          ]}}],
+          "request": { "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Feijoada completa\",\n  \"description\": \"Outro prato com o mesmo nome\",\n  \"price\": 39.90,\n  \"dineInOnly\": false\n}" },
+            "url": { "raw": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}/menu-items", "host": ["{{baseUrl}}"], "path": ["api","v1","restaurants","{{restaurantId}}","menu-items"] } },
+          "response": []
+        },
+        {
+          "name": "Criar item com nome duplicado em maiúsculas - 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test(\"400\", function () { pm.response.to.have.status(400); });"
+          ]}}],
+          "request": { "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"FEIJOADA COMPLETA\",\n  \"price\": 39.90,\n  \"dineInOnly\": false\n}" },
+            "url": { "raw": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}/menu-items", "host": ["{{baseUrl}}"], "path": ["api","v1","restaurants","{{restaurantId}}","menu-items"] } },
+          "response": []
+        },
+        {
           "name": "Listar itens do restaurante (público) - 200",
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test(\"200\", function () { pm.response.to.have.status(200); });"

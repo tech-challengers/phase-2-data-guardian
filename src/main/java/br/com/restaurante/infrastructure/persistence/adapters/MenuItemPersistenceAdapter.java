@@ -34,6 +34,12 @@ public class MenuItemPersistenceAdapter implements MenuItemRepositoryPort {
     }
 
     @Override
+    public Optional<MenuItem> findByRestaurantIdAndName(Long restaurantId, String name) {
+        return repository.findByRestaurantIdAndNameIgnoreCase(restaurantId, name)
+                .map(this::toDomain);
+    }
+
+    @Override
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
