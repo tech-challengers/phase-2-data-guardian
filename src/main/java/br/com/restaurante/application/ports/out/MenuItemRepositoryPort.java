@@ -4,14 +4,17 @@ import br.com.restaurante.core.domain.MenuItem;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MenuItemRepositoryPort {
 
     MenuItem save(MenuItem item);
 
-    Optional<MenuItem> findById(Long id);
+    Optional<MenuItem> findById(UUID id);
 
     List<MenuItem> findByRestaurantId(Long restaurantId);
 
-    void deleteById(Long id);
+    void deleteById(UUID id);
+
+    void existsByName(String name, Long restaurantId);
 }

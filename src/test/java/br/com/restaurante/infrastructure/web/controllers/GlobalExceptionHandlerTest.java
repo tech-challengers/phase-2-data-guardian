@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,6 +42,26 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
         assertNotNull(res.getBody());
         assertNull(res.getBody().getDetail());
+    }
+
+    @Test
+    void handleIllegalState_returns500() {
+        ResponseEntity<ProblemDetail> res = handler.handleIllegalState(new IllegalStateException("Erro interno de storage"));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, res.getStatusCode());
+        assertNotNull(res.getBody());
+        assertEquals("Erro interno de storage", res.getBody().getDetail());
+        assertEquals("Internal Server Error", res.getBody().getTitle());
+        assertEquals("https://api.restaurante.com/errors/500", res.getBody().getType().toString());
+    }
+
+    @Test
+    void handleMaxUploadSize_returns400() {
+        ResponseEntity<ProblemDetail> res = handler.handleMaxUploadSize(new MaxUploadSizeExceededException(10485760));
+        assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+        assertNotNull(res.getBody());
+        assertTrue(res.getBody().getDetail().contains("10 MB"));
+        assertEquals("Bad Request", res.getBody().getTitle());
+        assertEquals("https://api.restaurante.com/errors/400", res.getBody().getType().toString());
     }
 
     @Test

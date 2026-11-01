@@ -3,12 +3,14 @@ package br.com.restaurante.infrastructure.web.controllers;
 import br.com.restaurante.core.domain.exceptions.AccessDeniedDomainException;
 import br.com.restaurante.core.domain.exceptions.InvalidCredentialsException;
 import br.com.restaurante.core.domain.exceptions.InvalidTokenException;
+import br.com.restaurante.core.domain.exceptions.MenuItemExistingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.net.URI;
 
@@ -28,6 +30,24 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(problemDetail);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ProblemDetail> handleIllegalState(IllegalStateException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        problemDetail.setTitle("Internal Server Error");
+        problemDetail.setType(URI.create("https://api.restaurante.com/errors/500"));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "O arquivo enviado excede o tamanho máximo permitido (10 MB)");
+        problemDetail.setTitle("Bad Request");
+        problemDetail.setType(URI.create("https://api.restaurante.com/errors/400"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+    }
+
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ProblemDetail> handleInvalidCredentials(InvalidCredentialsException ex) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
@@ -42,6 +62,15 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, ex.getMessage());
         problemDetail.setTitle("Unauthorized");
+        problemDetail.setType(URI.create("https://api.restaurante.com/errors/401"));
+        return ResponseEntity.status(status).body(problemDetail);
+    }
+
+    @ExceptionHandler(MenuItemExistingException.class)
+    public ResponseEntity<ProblemDetail> handleMenuItemExistsError(MenuItemExistingException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, ex.getMessage());
+        problemDetail.setTitle("Bad Request");
         problemDetail.setType(URI.create("https://api.restaurante.com/errors/401"));
         return ResponseEntity.status(status).body(problemDetail);
     }

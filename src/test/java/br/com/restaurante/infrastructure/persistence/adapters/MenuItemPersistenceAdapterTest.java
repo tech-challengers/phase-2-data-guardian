@@ -10,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.*;
 
 class MenuItemPersistenceAdapterTest {
 
+    private static final UUID ID = UUID.fromString("87c9ef1c-fb4a-4d7e-898d-a48df32e84d3");
     private SpringMenuItemRepository repository;
     private MenuItemPersistenceAdapter adapter;
 
@@ -28,7 +30,7 @@ class MenuItemPersistenceAdapterTest {
 
     private MenuItemEntity entity() {
         return MenuItemEntity.builder()
-                .id(100L)
+                .id(ID)
                 .restaurantId(10L)
                 .name("Feijoada")
                 .description("Completa")
@@ -57,7 +59,7 @@ class MenuItemPersistenceAdapterTest {
         assertTrue(sent.isDineInOnly());
         assertEquals("/img/f.jpg", sent.getPhotoPath());
 
-        assertEquals(100L, saved.getId());
+        assertEquals(ID, saved.getId());
         assertEquals(10L, saved.getRestaurantId());
         assertEquals("Feijoada", saved.getName());
         assertEquals("Completa", saved.getDescription());
@@ -68,9 +70,9 @@ class MenuItemPersistenceAdapterTest {
 
     @Test
     void findById_found() {
-        when(repository.findById(100L)).thenReturn(Optional.of(entity()));
+        when(repository.findById(ID)).thenReturn(Optional.of(entity()));
 
-        Optional<MenuItem> found = adapter.findById(100L);
+        Optional<MenuItem> found = adapter.findById(ID);
 
         assertTrue(found.isPresent());
         assertEquals("Feijoada", found.get().getName());
@@ -79,19 +81,21 @@ class MenuItemPersistenceAdapterTest {
 
     @Test
     void findById_notFound() {
-        when(repository.findById(999L)).thenReturn(Optional.empty());
+        UUID id = UUID.fromString("e3682907-aec1-4b0a-ac6b-5f37a6eb8b16");
+        when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertTrue(adapter.findById(999L).isEmpty());
+        assertTrue(adapter.findById(id).isEmpty());
     }
 
     @Test
     void findByRestaurantId_returnsMappedList() {
-        when(repository.findByRestaurantId(10L)).thenReturn(List.of(entity()));
+        long restaurantId = 10L;
+        when(repository.findByRestaurantId(restaurantId)).thenReturn(List.of(entity()));
 
-        List<MenuItem> result = adapter.findByRestaurantId(10L);
+        List<MenuItem> result = adapter.findByRestaurantId(restaurantId);
 
         assertEquals(1, result.size());
-        assertEquals(100L, result.get(0).getId());
+        assertEquals(ID, result.getFirst().getId());
     }
 
     @Test
@@ -103,8 +107,8 @@ class MenuItemPersistenceAdapterTest {
 
     @Test
     void deleteById_delegatesToRepository() {
-        adapter.deleteById(100L);
+        adapter.deleteById(ID);
 
-        verify(repository).deleteById(100L);
+        verify(repository).deleteById(ID);
     }
 }
