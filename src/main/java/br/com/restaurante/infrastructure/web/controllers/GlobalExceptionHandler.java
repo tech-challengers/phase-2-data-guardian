@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.net.URI;
 
@@ -26,6 +27,24 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create("https://api.restaurante.com/errors/" + status.value()));
 
         return ResponseEntity.status(status).body(problemDetail);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ProblemDetail> handleIllegalState(IllegalStateException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        problemDetail.setTitle("Internal Server Error");
+        problemDetail.setType(URI.create("https://api.restaurante.com/errors/500"));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "O arquivo enviado excede o tamanho máximo permitido (10 MB)");
+        problemDetail.setTitle("Bad Request");
+        problemDetail.setType(URI.create("https://api.restaurante.com/errors/400"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
