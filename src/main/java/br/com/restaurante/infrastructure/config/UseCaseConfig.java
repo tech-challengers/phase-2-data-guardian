@@ -6,6 +6,7 @@ import br.com.restaurante.application.ports.in.UserTypeUseCase;
 import br.com.restaurante.application.ports.in.UserUseCase;
 import br.com.restaurante.application.ports.in.MenuItemUseCase;
 import br.com.restaurante.application.ports.out.PasswordEncoderPort;
+import br.com.restaurante.application.ports.out.StoragePort;
 import br.com.restaurante.application.ports.out.TokenPort;
 import br.com.restaurante.application.ports.out.UserRepositoryPort;
 import br.com.restaurante.application.ports.out.UserTypeRepositoryPort;
@@ -55,9 +56,9 @@ public class UseCaseConfig {
     @Bean
     public MenuItemUseCase menuItemUseCase(
             MenuItemRepositoryPort menuItemPort,
-            RestauranteRepositoryPort restaurantePort
+            RestauranteRepositoryPort restaurantePort,
+            StoragePort storagePort
     ) {
-        return new MenuItemService(menuItemPort, restaurantePort);
+        return new MenuItemService(menuItemPort, restaurantePort, storagePort);
     }
 }
-

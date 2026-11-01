@@ -17,6 +17,12 @@ spring:
       hibernate:
         format_sql: true
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 12MB
+
 jwt:
   secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   expiration-ms: ${JWT_EXPIRATION_MS:86400000}
@@ -29,6 +35,18 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+# ---------------------------------------------------------------------------
+# Supabase Storage
+# ---------------------------------------------------------------------------
+# SUPABASE_URL             → URL base do projeto (ex: https://xyz.supabase.co)
+# SUPABASE_KEY             → Chave de API (Service Role Key ou Anon Key)
+# SUPABASE_STORAGE_BUCKET   → Nome do bucket de storage (default: menu-items)
+# ---------------------------------------------------------------------------
+supabase:
+  url: ${SUPABASE_URL:https://test-project.supabase.co}
+  key: ${SUPABASE_KEY:test-key}
+  storage-bucket: ${SUPABASE_STORAGE_BUCKET:menu-items}
 
 ---
 spring:

@@ -87,7 +87,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErroResponse'
-
     put:
       tags:
         - Restaurante
@@ -376,7 +375,9 @@ paths:
     post:
       tags:
         - MenuItem
-      summary: Create a menu item for a restaurant
+      summary: Create a menu item with image URL
+      description: >
+        Cria um item de menu recebendo os dados em JSON (incluindo opcionalmente photoPath como URL externa).
       operationId: createMenuItem
       security:
         - bearerAuth: []
@@ -393,6 +394,59 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MenuItemRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '400':
+          description: Invalid data
+        '401':
+          description: Unauthorized
+        '403':
+          description: Only the restaurant owner can manage the menu
+        '404':
+          description: Restaurant not found
+
+  /api/v1/restaurants/{restaurantId}/menu-items/with-photo:
+    post:
+      tags:
+        - MenuItem
+      summary: Create a menu item with image file upload
+      description: >
+        Cria um item de menu recebendo os dados em JSON (campo "data") e o arquivo de imagem
+        (campo "photo") em uma única requisição multipart/form-data. A imagem é salva automaticamente
+        no Supabase Storage e sua URL pública é persistida no item.
+      operationId: createMenuItemWithPhoto
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - data
+                - photo
+              properties:
+                data:
+                  type: string
+                  description: JSON com os dados do item (nome, preço, dineInOnly, etc.)
+                  example: '{"name":"Feijoada","description":"Completa","price":49.90,"dineInOnly":false}'
+                photo:
+                  type: string
+                  format: binary
+                  description: Arquivo de imagem para upload no Supabase Storage
       responses:
         '201':
           description: Created
@@ -489,6 +543,83 @@ paths:
           description: Only the restaurant owner can manage the menu
         '404':
           description: Not Found
+
+  /api/v1/menu-items/{id}/photo:
+    post:
+      tags:
+        - MenuItem
+      summary: Upload or replace the photo of a menu item
+      description: >
+        Recebe a imagem via multipart/form-data, faz upload no Supabase Storage,
+        persiste a URL pública no item e retorna o item atualizado.
+        Se o item já possuía uma foto salva no storage, a foto anterior é excluída automaticamente.
+      operationId: uploadMenuItemPhoto
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - photo
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  description: Arquivo de imagem (JPEG, PNG, WEBP, GIF)
+      responses:
+        '200':
+          description: Foto enviada e item atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '400':
+          description: Arquivo inválido ou ausente
+        '401':
+          description: Unauthorized
+        '403':
+          description: Only the restaurant owner can manage the menu
+        '404':
+          description: Menu item not found
+    delete:
+      tags:
+        - MenuItem
+      summary: Remove the photo of a menu item
+      description: >
+        Exclui a foto do Supabase Storage e limpa o campo photoPath do item de menu.
+      operationId: deleteMenuItemPhoto
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Foto removida com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Only the restaurant owner can manage the menu
+        '404':
+          description: Menu item not found
 
 components:
   securitySchemes:
@@ -688,7 +819,7 @@ components:
           example: false
         photoPath:
           type: string
-          description: Path where the dish photo is stored
+          description: Path where the dish photo is stored or URL
           example: /images/menu/feijoada.jpg
 
     MenuItemResponse:
@@ -710,3 +841,4 @@ components:
           type: boolean
         photoPath:
           type: string
+          description: URL pública da foto armazenada no Supabase Storage
