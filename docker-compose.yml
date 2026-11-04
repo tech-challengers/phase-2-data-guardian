@@ -40,6 +40,19 @@ services:
       retries: 10
       start_period: 15s
 
+  sonar-db:
+    image: postgres:17-alpine
+    container_name: data-guardian-sonar-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    volumes:
+      - sonar_db_data:/var/lib/postgresql/data
+    networks:
+      - data-guardian-net
+
 networks:
   phase2-data-guardian-net:
     driver: bridge

@@ -1,0 +1,31 @@
+openapi: 3.0.3
+info:
+  title: Data Guardian API
+  description: Base OpenAPI definition for Data Guardian
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local Server
+paths:
+  /api/v1/health:
+    get:
+      summary: Health check endpoint
+      operationId: getHealthStatus
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: UP
+        timestamp:
+          type: string
+          format: date-time
